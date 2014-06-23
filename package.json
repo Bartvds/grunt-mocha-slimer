@@ -1,6 +1,6 @@
 {
   "name": "grunt-mocha-slimer",
-  "description": "Grunt plugin runs Mocha tests in a (nearly) headless Gecko browser via Slimerjs",
+  "description": "Grunt plugin runs Mocha tests in a (nearly) headless Gecko browser via SlimerJS",
   "version": "0.0.1",
   "homepage": "https://github.com/Bartvds/grunt-mocha-slimer",
   "author": {

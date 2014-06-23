@@ -13,6 +13,8 @@ module.exports = function (messageKey, options) {
 		}
 
 		mochaInstance.reporters.HTML.call(this, runner);
+
+		// listen for mocha events
 		[
 			'start',
 			'test',
@@ -45,14 +47,15 @@ module.exports = function (messageKey, options) {
 				});
 			});
 	};
+	// setup customized HTML reporter
 	var Klass = function () {};
 	Klass.prototype = mochaInstance.reporters.HTML.prototype;
 	Reporter.prototype = new Klass();
 
+	// config for mocha
 	var config = {
 		ui: 'bdd',
 		ignoreLeaks: true
-
 	};
 	if (options) {
 		if (typeof options === "string") {
@@ -63,9 +66,11 @@ module.exports = function (messageKey, options) {
 			}
 		}
 	}
+	// make sure we use this
 	config.reporter = Reporter;
 
 	mocha.setup(config);
+
 	if (options.run) {
 		mocha.run();
 	}

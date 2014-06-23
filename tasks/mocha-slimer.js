@@ -1,6 +1,7 @@
 module.exports = function (grunt) {
 	'use strict';
 
+	var util = require('util');
 	var path = require('path');
 	var events = require('events');
 
@@ -9,42 +10,53 @@ module.exports = function (grunt) {
 
 	function multi(data, sep) {
 		if (typeof data !== 'string') {
-			return data;
+			data = util.inspect(data, {depth: 4});
 		}
 		return sep + String(data).split(/\r?\n/g).join('\n' + sep);
 	}
 
 	grunt.registerMultiTask('mocha_slimer', 'Run mocha in slimerjs', function () {
+		// user options
 		var options = this.options({
-			urls: [],
 			timeout: 10000,
+			reporter: 'Spec',
 			ui: 'bdd',
 			run: true,
+			xvfb: false,
 			mocha: {},
-			reporter: 'Spec'
+			urls: []
 		});
 		var done = this.async();
 
+		var tests = this.filesSrc.reduce(function (memo, src) {
+			if (/^https?:\/\//.test(src)) {
+				memo.push(src);
+			}
+			memo.push(path.resolve(process.cwd(), src));
+			return memo;
+		}, options.urls);
+
+		// passed to wrapper & main
 		var params = {
 			timeout: options.timeout,
-			cwd: process.cwd(),
-			tests: this.filesSrc.reduce(function (memo, src) {
-				if (/^https?:\/\//.test(src)) {
-					memo.push(src);
-				}
-				memo.push(path.resolve(process.cwd(), src));
-				return memo;
-			}, options.urls),
+			xvfb: options.xvfb,
+			tests: tests,
+			// passed to inject
 			options: {
 				ui: options.ui,
 				run: options.run,
+				// passed to mocha
 				mocha: options.mocha
 			}
 		};
 
 		var slimer = wrapper.create(params);
 
+		// facade test runner
 		var runner = new events.EventEmitter();
+
+		// pessimist
+		var exitCode = 1;
 
 		var suites = [];
 		var stats = [];
@@ -56,13 +68,14 @@ module.exports = function (grunt) {
 		var reporter = new Reporter(runner);
 
 		slimer.on('log', function (data) {
-			console.log(multi(data, '> '));
+			console.log(data);
 		});
 
 		slimer.on('error', function (error) {
 			console.error(multi(error, '! '));
 		});
 
+		// capture mocha events and emit to facade runner
 		slimer.on('mocha', function (event) {
 			if (event.type === 'end') {
 				stats.push(event.data.stats);
@@ -90,13 +103,9 @@ module.exports = function (grunt) {
 			runner.emit(event.type, test, (test ? test.err : null));
 		});
 
-		var exitCode = 1;
-
 		slimer.on('exit', function (data) {
 			exitCode = data.code;
-			if (exitCode !== 0) {
-				console.log(multi(data.reason, '>> '));
-			}
+			console.log(multi(data.reason, '>> '));
 		});
 
 		slimer.on('close', function () {

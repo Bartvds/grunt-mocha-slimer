@@ -32,8 +32,9 @@ module.exports = function (grunt) {
 		mocha_slimer: {
 			test: {
 				options: {
-					timeout: 10000,
+					xvfb: !!process.env.TRAVIS,
 					reporter: 'mocha-unfunk-reporter',
+					timeout: 10000,
 					run: true
 				},
 				src: ['test/*.html']

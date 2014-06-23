@@ -1,10 +1,6 @@
 var params = JSON.parse(phantom.args[0]);
 var inject = require('./inject');
 var webpage = require('webpage');
-
-var messageScan = '["' + params.key + '",';
-var messageScanL = messageScan.length;
-
 var queue = params.tests.slice(0);
 
 function getURL(test) {
@@ -19,6 +15,8 @@ function sendMessage(type, content) {
 	console.log(JSON.stringify([params.key, type, content]));
 }
 
+var messageScan = '["' + params.key + '",';
+var messageScanL = messageScan.length;
 
 var bridge = {
 	log: function (content) {
@@ -38,7 +36,7 @@ var timeout = setTimeout(function () {
 	bridge.exit(2, 'timeout');
 }, params.timeout);
 
-
+// TODO properly pass this through (rebuild as fake Error?)
 phantom.onError = function (msg, stack) {
 	var msg = '\nScript Error: ' + msg + '\n';
 	if (stack && stack.length) {
@@ -51,7 +49,7 @@ phantom.onError = function (msg, stack) {
 	bridge.exit(2);
 };
 
-function step() {
+function runSuite() {
 	if (queue.length === 0) {
 		// give it a breather or it crashes
 		setTimeout(function () {
@@ -61,7 +59,7 @@ function step() {
 	}
 	var url = getURL(queue.shift());
 
-	bridge.log('Testing ' + url);
+	bridge.log('testing ' + url);
 
 	var page = webpage.create();
 
@@ -74,7 +72,9 @@ function step() {
 			var data = JSON.parse(message);
 			if (data.length === 3 && data[1] === 'mocha' && data[2] && data[2].type === 'end') {
 				console.log(message);
-				step();
+
+				// try next suite
+				runSuite();
 			}
 			else {
 				console.log(message);
@@ -93,4 +93,5 @@ function step() {
 	});
 }
 
-step();
+// ok let's go
+runSuite();
