@@ -15,4 +15,9 @@ describe('slimer', function() {
 		console.log('nooo!');
 		assert.isTrue(false);
 	})
+
+	it.skip('skips', function() {
+		console.log('nooo!');
+		assert.isTrue(false);
+	})
 });

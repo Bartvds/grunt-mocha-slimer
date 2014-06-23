@@ -38,6 +38,10 @@ module.exports = function (messageKey, options) {
 						data.slow = test.slow;
 					}
 
+					if (type === 'end') {
+						data.stats = runner.stats;
+					}
+
 					sendMessage('mocha', {type: type, data: data});
 				});
 			});
@@ -63,9 +67,6 @@ module.exports = function (messageKey, options) {
 			}
 		}
 	}
-
-	sendMessage('log', config);
-
 	mocha.setup(config);
 	mocha.run();
 };

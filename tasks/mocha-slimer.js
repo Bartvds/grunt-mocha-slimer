@@ -4,6 +4,7 @@ module.exports = function (grunt) {
 	var path = require('path');
 	var events = require('events');
 	var brigdeMod = require('../lib/bridge');
+	var helper = require('../lib/helper');
 	var reporters = require('mocha').reporters;
 
 	grunt.registerMultiTask('mocha_slimer', 'Run mocha in slimerjs', function () {
@@ -19,7 +20,7 @@ module.exports = function (grunt) {
 		var params = {
 			timeout: options.timeout,
 			cwd: process.cwd(),
-			tests: this.filesSrc.reduce(function(memo, src) {
+			tests: this.filesSrc.reduce(function (memo, src) {
 				if (/^https?:\/\//.test(src)) {
 					memo.push(src);
 				}
@@ -58,7 +59,8 @@ module.exports = function (grunt) {
 				try {
 					Reporter = require(externalReporter);
 				}
-				catch (e) { }
+				catch (e) {
+				}
 			}
 		}
 		if (Reporter === null) {
@@ -77,39 +79,40 @@ module.exports = function (grunt) {
 		});
 
 		var suites = [];
+		var stats = [];
 
-		bridge.on('mocha', function (ev) {
+		bridge.on('mocha', function (event) {
 			var fullTitle, slow;
 
-			if (ev.type === 'end') {
-				// whut?
+			if (event.type === 'end') {
+				stats.push(event.data.stats);
 			}
 
-			var test = ev.data;
+			var test = event.data;
 
 			// Expand test values (and façace the Mocha test object)
 			if (test) {
 				fullTitle = test.fullTitle;
-				test.fullTitle = function() {
+				test.fullTitle = function () {
 					return fullTitle;
 				};
 
 				slow = this.slow;
-				test.slow = function() {
+				test.slow = function () {
 					return slow;
 				};
 
 				test.parent = suites[suites.length - 1] || null;
 			}
 
-			if (ev.type === 'suite') {
+			if (event.type === 'suite') {
 				suites.push(test);
 			}
-			else if (ev.type === 'suite end') {
+			else if (event.type === 'suite end') {
 				suites.pop();
 			}
 
-			runner.emit(ev.type, test, (test ? test.err : null));
+			runner.emit(event.type, test, (test ? test.err : null));
 		});
 
 		bridge.on('exit', function (reason) {
@@ -117,8 +120,38 @@ module.exports = function (grunt) {
 		});
 
 		bridge.on('close', function (status) {
+
+			var total = helper.reduceStats(stats);
+
+			var report = '\n>> ';
+			var str;
+
+			str = 'failed ' + total.failures;
+			report += (total.failures > 0 ? str.red : str.green);
+			report += ' and ';
+
+			str = 'passed ' + total.passes;
+			report += (total.failures > 0 ? str.yellow : str.green);
+			report += ' of ';
+
+			str = total.tests + ' ' + (total.tests === 1 ? 'test' : 'tests');
+			report += (total.tests ? str.cyan : str.red) + ' total';
+
+			if (total.pending > 0) {
+				report += ', left ';
+				str = total.pending + ' pending'
+				report += str.yellow;
+			}
+
+			report += ' (' + total.duration + 'ms)\n';
+
+			grunt.log.writeln(report);
+
 			if (status.code !== 0) {
 				grunt.log.warn('slimer exited with code ' + status.code);
+				done(false);
+			}
+			else if (total.failures > 0) {
 				done(false);
 			}
 			else {

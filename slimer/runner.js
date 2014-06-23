@@ -50,12 +50,16 @@ var queue = params.tests.slice(0);
 
 function step() {
 	if (queue.length === 0) {
-		bridge.exit(0, 'done');
+		// give it a breather or it crashes
+		setTimeout(function() {
+			bridge.exit(0, 'done');
+		}, 10);
 		return;
 	}
 	var url = getURL(queue.shift());
 
 	bridge.log(url);
+
 	var page = webpage.create();
 
 	page.onError = function (err) {

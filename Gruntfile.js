@@ -13,6 +13,7 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-copy');
+	grunt.loadNpmTasks('grunt-mocha');
 
 	grunt.loadTasks('tasks');
 
@@ -29,11 +30,22 @@ module.exports = function (grunt) {
 				'tasks/**/*.js'
 			]
 		},
+		mocha: {
+			test: {
+				options: {
+					timeout: 10000,
+					reporter: 'mocha-unfunk-reporter',
+					run: true
+				},
+				src: ['test/inde*.html']
+			}
+		},
 		mocha_slimer: {
 			test: {
 				options: {
 					timeout: 10000,
-					reporter: 'mocha-unfunk-reporter'
+					reporter: 'mocha-unfunk-reporter',
+					run: true
 				},
 				src: ['test/inde*.html']
 			}
@@ -46,4 +58,5 @@ module.exports = function (grunt) {
 		'mocha_slimer'
 	]);
 	grunt.registerTask('default', ['test']);
+	grunt.registerTask('dev', ['mocha']);
 };
