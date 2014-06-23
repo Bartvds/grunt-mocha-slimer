@@ -10,20 +10,18 @@ Build on [SlimerJS](https://github.com/graingert/slimerjs) npm module, some part
 :warning: Very early version, user beware.
 
 
-## Missing/borken
+## Known issues
 
-- error messages in async errors
+- no error messages in async errors
 - stack traces missing
 - real-world use
 
 
 ## Wish-list
 
-- support for `xvfb` command for Travis etc
-- support some commandline parameters
+- support more SlimerJS commandline parameters
     - user profile handling
-    - proxy etc
-    -many more
+    - proxy
 - loot some more features from grunt-mocha
 - expose screenshot feature?
 - expose a file-io stream (to dump debug data to disk)?
@@ -31,15 +29,19 @@ Build on [SlimerJS](https://github.com/graingert/slimerjs) npm module, some part
 
 ## Why this and not a PhantomJS based grunt + mocha?
 
-- SlimerJS uses Gecko so it's another flavour browser engine
-- Seems slightly faster as all tests are run in one process (not sure why grunt-mocha doesn't do that, we'll see).
+- SlimerJS uses Gecko so it's another browser engine from PhantomJS' Webkit.
 - PhantomJS uses an ancient Webkit version that is missing some modern features, like Uint8ClampedArray, Float64Array etc.
-- SlimerJS supports add-ons and user-profiles (could be added here hf thee is a use-case)
-- This modules streams tests and log data over stdout for faster feedback.
+- SlimerJS supports addons and user-profiles (could be added here if thee is a use-case)
+- `grunt-mocha-slimer` seems slightly faster then `grunt-mocha` as all tests are run in one process (not sure why grunt-mocha doesn't do that, we'll see).
+- This modules streams tests and log data over SlimerJS' stdout for snappy feedback.
 
-## I see flashing windows.
 
-This is the nature of SlimerJS and the engine it runs. At some point this moduile will support the `xvfb` wrapper for Linux and OSX. For more info see the [SlimerJS documentantion](http://docs.slimerjs.org/current/installation.html#having-a-headless-slimerjs).
+## I see with flashing windows?
+
+This is the nature of SlimerJS and the engine it runs. SlimerJS has support for `xvfb` wrapper for Linux and OSX. For more info see the [SlimerJS documentantion](http://docs.slimerjs.org/current/installation.html#having-a-headless-slimerjs).
+
+You can enable this by setting `xvfb: true` (you need this for Travis-CI, see below).
+
 
 ## Getting Started
 
@@ -57,10 +59,12 @@ Once the plugin has been installed, it may be enabled inside your Gruntfile with
 grunt.loadNpmTasks('grunt-mocha-slimer');
 ```
 
+
 ## The "grunt-mocha-slimer" task
 
-### Options
+For an example html see the [./test folder](https://github.com/Bartvds/grunt-mocha-slimer/tree/master/test).
 
+### Basic options
 
 ```js
 grunt.initConfig({
@@ -70,7 +74,6 @@ grunt.initConfig({
 				ui: 'bdd'
 				reporter: 'Spec'
 				run: true,
-				urls: []
 			},
 			src: ['test/index.html']
 		}
@@ -78,9 +81,37 @@ grunt.initConfig({
 });
 ```
 
+### Advanced options
+
+```js
+grunt.initConfig({
+	mocha_slimerjs: {
+		all: {
+			options: {
+				ui: 'bdd'
+				reporter: 'Spec'
+				grep: 'some keyword'
+				// SlimerJS timeout
+				timeout: 10000,
+				// set to false and call it later for async tests (AMD etc)
+				run: false,
+				// run SlimerJS via 'xvfb-run': for true headless testing
+				// must be true on Travis-CI, use: !!process.env.TRAVIS
+				xvfb: true,
+				// pass http urls (use grunt-contrib-connect etc)
+				urls: ['http://localhost:8080/test/index.html']
+			}
+		}
+	}
+});
+```
+
+More to come at a later date.
+
+
 ## History
 
-* 0.0.1 - Dev release
+* 0.0.x - Early release
 
 
 ## Contributing
