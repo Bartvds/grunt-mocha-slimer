@@ -1,9 +1,10 @@
+// this function gets called in the context of the tst html page
+// all values need to be passed in, no closures allowed
+
 module.exports = function (messageKey, options) {
 	function sendMessage(type, content) {
 		console.log(JSON.stringify([messageKey, type, content]));
 	}
-
-	sendMessage('log', 'hi from ' + window.location.href);
 
 	var mochaInstance = window.Mocha || window.mocha;
 	var Reporter = function (runner) {
@@ -11,9 +12,7 @@ module.exports = function (messageKey, options) {
 			throw new Error('Mocha was not found, make sure you include Mocha in your HTML spec file.');
 		}
 
-		// Setup HTML reporter to output data on the screen
 		mochaInstance.reporters.HTML.call(this, runner);
-
 		[
 			'start',
 			'test',
@@ -50,23 +49,24 @@ module.exports = function (messageKey, options) {
 	Klass.prototype = mochaInstance.reporters.HTML.prototype;
 	Reporter.prototype = new Klass();
 
-	// Default mocha options
 	var config = {
 		ui: 'bdd',
-		ignoreLeaks: true,
-		reporter: Reporter
+		ignoreLeaks: true
+
 	};
 	if (options) {
-		// If options is a string, assume it is to set the UI (bdd/tdd etc)
 		if (typeof options === "string") {
 			config.ui = options;
 		} else {
-			// Extend defaults with passed options
 			for (key in options.mocha) {
 				config[key] = options.mocha[key];
 			}
 		}
 	}
+	config.reporter = Reporter;
+
 	mocha.setup(config);
-	mocha.run();
+	if (options.run) {
+		mocha.run();
+	}
 };

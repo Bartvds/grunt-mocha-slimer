@@ -46,7 +46,6 @@
     "grunt-contrib-clean": "^0.5.0",
     "grunt-contrib-copy": "^0.5.0",
     "grunt-contrib-jshint": "^0.10.0",
-    "grunt-mocha": "^0.4.11",
     "mocha-unfunk-reporter": "^0.4.0"
   },
   "peerDependencies": {

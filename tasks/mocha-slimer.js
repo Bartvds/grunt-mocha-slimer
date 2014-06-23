@@ -3,15 +3,23 @@ module.exports = function (grunt) {
 
 	var path = require('path');
 	var events = require('events');
-	var brigdeMod = require('../lib/bridge');
+
+	var wrapper = require('../lib/wrapper');
 	var helper = require('../lib/helper');
-	var reporters = require('mocha').reporters;
+
+	function multi(data, sep) {
+		if (typeof data !== 'string') {
+			return data;
+		}
+		return sep + String(data).split(/\r?\n/g).join('\n' + sep);
+	}
 
 	grunt.registerMultiTask('mocha_slimer', 'Run mocha in slimerjs', function () {
 		var options = this.options({
 			urls: [],
 			timeout: 10000,
 			ui: 'bdd',
+			run: true,
 			mocha: {},
 			reporter: 'Spec'
 		});
@@ -29,79 +37,47 @@ module.exports = function (grunt) {
 			}, options.urls),
 			options: {
 				ui: options.ui,
+				run: options.run,
 				mocha: options.mocha
 			}
 		};
 
-		function multi(data, sep) {
-			if (typeof data !== 'string') {
-				return data;
-			}
-			return sep + String(data).split(/\r?\n/g).join('\n' + sep);
-		}
+		var slimer = wrapper.create(params);
 
 		var runner = new events.EventEmitter();
 
-		var Reporter = null;
-		if (reporters[options.reporter]) {
-			Reporter = reporters[options.reporter];
-		} else {
-			// Resolve external reporter module
-			var externalReporter;
-			try {
-				externalReporter = require.resolve(options.reporter);
-			} catch (e) {
-				// Resolve to local path
-				externalReporter = path.resolve(options.reporter);
-			}
+		var suites = [];
+		var stats = [];
 
-			if (externalReporter) {
-				try {
-					Reporter = require(externalReporter);
-				}
-				catch (e) {
-				}
-			}
-		}
+		var Reporter = helper.getReporter(options.reporter);
 		if (Reporter === null) {
 			grunt.fatal('Specified reporter is unknown or unresolvable: ' + options.reporter);
 		}
 		var reporter = new Reporter(runner);
 
-		var bridge = brigdeMod.create(params);
-
-		bridge.on('log', function (data) {
+		slimer.on('log', function (data) {
 			console.log(multi(data, '> '));
 		});
 
-		bridge.on('error', function (error) {
+		slimer.on('error', function (error) {
 			console.error(multi(error, '! '));
 		});
 
-		var suites = [];
-		var stats = [];
-
-		bridge.on('mocha', function (event) {
-			var fullTitle, slow;
-
+		slimer.on('mocha', function (event) {
 			if (event.type === 'end') {
 				stats.push(event.data.stats);
 			}
 
 			var test = event.data;
-
-			// Expand test values (and façace the Mocha test object)
 			if (test) {
-				fullTitle = test.fullTitle;
+				var fullTitle = test.fullTitle;
 				test.fullTitle = function () {
 					return fullTitle;
 				};
-
-				slow = this.slow;
+				var slow = this.slow;
 				test.slow = function () {
 					return slow;
 				};
-
 				test.parent = suites[suites.length - 1] || null;
 			}
 
@@ -111,15 +87,19 @@ module.exports = function (grunt) {
 			else if (event.type === 'suite end') {
 				suites.pop();
 			}
-
 			runner.emit(event.type, test, (test ? test.err : null));
 		});
 
-		bridge.on('exit', function (reason) {
-			console.log(multi(reason, '>> '));
+		var exitCode = 1;
+
+		slimer.on('exit', function (data) {
+			exitCode = data.code;
+			if (exitCode !== 0) {
+				console.log(multi(data.reason, '>> '));
+			}
 		});
 
-		bridge.on('close', function (status) {
+		slimer.on('close', function () {
 
 			var total = helper.reduceStats(stats);
 
@@ -139,7 +119,7 @@ module.exports = function (grunt) {
 
 			if (total.pending > 0) {
 				report += ', left ';
-				str = total.pending + ' pending'
+				str = total.pending + ' pending';
 				report += str.yellow;
 			}
 
@@ -147,8 +127,8 @@ module.exports = function (grunt) {
 
 			grunt.log.writeln(report);
 
-			if (status.code !== 0) {
-				grunt.log.warn('slimer exited with code ' + status.code);
+			if (exitCode !== 0) {
+				grunt.log.warn('slimer exited with code ' + exitCode);
 				done(false);
 			}
 			else if (total.failures > 0) {

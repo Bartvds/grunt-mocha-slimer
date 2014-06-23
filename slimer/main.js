@@ -2,10 +2,23 @@ var params = JSON.parse(phantom.args[0]);
 var inject = require('./inject');
 var webpage = require('webpage');
 
+var messageScan = '["' + params.key + '",';
+var messageScanL = messageScan.length;
+
+var queue = params.tests.slice(0);
+
+function getURL(test) {
+	if (/^https?:\/\//.test(test)) {
+		return test;
+	}
+	return 'file:///' + test.replace(/\\/g, '/');
+}
+
 function sendMessage(type, content) {
 	type = type || 'log';
 	console.log(JSON.stringify([params.key, type, content]));
 }
+
 
 var bridge = {
 	log: function (content) {
@@ -15,14 +28,16 @@ var bridge = {
 		sendMessage('error', content || '<unknown>');
 	},
 	exit: function (code, reason) {
-		sendMessage('exit', reason || '<unknown>');
-		phantom.exit(code);
+		sendMessage('exit', {code: code, reason: reason || '<unknown>'});
+		// slimer doesn't support real exit-codes
+		phantom.exit();
 	}
-}
+};
 
 var timeout = setTimeout(function () {
 	bridge.exit(2, 'timeout');
 }, params.timeout);
+
 
 phantom.onError = function (msg, stack) {
 	var msg = '\nScript Error: ' + msg + '\n';
@@ -36,29 +51,17 @@ phantom.onError = function (msg, stack) {
 	bridge.exit(2);
 };
 
-var messageScan = '["' + params.key + '",';
-var messageScanL = messageScan.length;
-
-function getURL(test) {
-	if (/^https?:\/\//.test(test)) {
-		return test;
-	}
-	return 'file:///' + test.replace(/\\/g, '/');
-}
-
-var queue = params.tests.slice(0);
-
 function step() {
 	if (queue.length === 0) {
 		// give it a breather or it crashes
-		setTimeout(function() {
+		setTimeout(function () {
 			bridge.exit(0, 'done');
 		}, 10);
 		return;
 	}
 	var url = getURL(queue.shift());
 
-	bridge.log(url);
+	bridge.log('Testing ' + url);
 
 	var page = webpage.create();
 

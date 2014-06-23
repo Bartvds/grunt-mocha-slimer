@@ -1,19 +1,23 @@
-console.log('let\'s rock!');
-
 chai.config.includeStack = true;
 
 var assert = chai.assert;
 
-describe('slimer', function() {
+describe('fail', function() {
 
-	it('works', function() {
-		console.log('booya!');
+	it('works 2', function() {
 		assert.isTrue(true);
 	})
 
-	it('fails', function() {
-		console.log('nooo!');
+	it('fails sync', function() {
 		assert.isTrue(false);
+	})
+
+	it('fails async', function(done) {
+		setTimeout(function() {
+			assert.isTrue(false);
+
+			done()
+		}, 50);
 	})
 
 	it.skip('skips', function() {
