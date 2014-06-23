@@ -1,4 +1,6 @@
 var params = JSON.parse(phantom.args[0]);
+var inject = require('./inject');
+var webpage = require('webpage');
 
 function sendMessage(type, content) {
 	type = type || 'log';
@@ -34,13 +36,8 @@ phantom.onError = function (msg, stack) {
 	bridge.exit(2);
 };
 
-var page = require('webpage').create();
-
-page.onError = function (arguments) {
-	bridge.log('onError');
-	bridge.error(arguments);
-};
-
+var messageScan = '["' + params.key + '",';
+var messageScanL = messageScan.length;
 
 function getURL(test) {
 	if (/^https?:\/\//.test(test)) {
@@ -49,104 +46,44 @@ function getURL(test) {
 	return 'file:///' + test.replace(/\\/g, '/');
 }
 
-var url = getURL(params.tests[0]);
+var queue = params.tests.slice(0);
 
-bridge.log(url);
-
-page.open(url, function (status) {
-	if (status !== 'success') {
-		bridge.exit(1, 'could not open: ' + url);
+function step() {
+	if (queue.length === 0) {
+		bridge.exit(0, 'done');
+		return;
 	}
+	var url = getURL(queue.shift());
 
-	page.evaluate(function (messageKey, options) {
-		function sendMessage(type, content) {
-			console.log(JSON.stringify([messageKey, type, content]));
-		}
+	bridge.log(url);
+	var page = webpage.create();
 
-		sendMessage('log', 'hi from ' + window.location.href);
+	page.onError = function (err) {
+		bridge.error(err);
+	};
 
-		var mochaInstance = window.Mocha || window.mocha;
-		var Reporter = function (runner) {
-			if (!mochaInstance) {
-				throw new Error('Mocha was not found, make sure you include Mocha in your HTML spec file.');
+	page.onConsoleMessage = function (message) {
+		if (String(message).substr(0, messageScanL) === messageScan) {
+			var data = JSON.parse(message);
+			if (data.length === 3 && data[1] === 'mocha' && data[2] && data[2].type === 'end') {
+				console.log(message);
+				step();
 			}
-
-			// Setup HTML reporter to output data on the screen
-			mochaInstance.reporters.HTML.call(this, runner);
-
-			[
-				'start',
-				'test',
-				'test end',
-				'suite',
-				'suite end',
-				'fail',
-				'pass',
-				'pending',
-				'end'
-			].forEach(function(type) {
-				runner.on(type, function (test, err) {
-					var data = {
-						err: err
-					};
-
-					if (test) {
-						data.title = test.title;
-						data.fullTitle = test.fullTitle();
-						data.state = test.state;
-						data.duration = test.duration;
-						data.slow = test.slow;
-					}
-
-					sendMessage('mocha', {type: type, data: data});
-				});
-			});
-		};
-		var Klass = function () {};
-		Klass.prototype = mochaInstance.reporters.HTML.prototype;
-		Reporter.prototype = new Klass();
-
-		// Default mocha options
-		var config = {
-			ui: 'bdd',
-			ignoreLeaks: true,
-			reporter: Reporter
-		};
-		if (options) {
-			// If options is a string, assume it is to set the UI (bdd/tdd etc)
-			if (typeof options === "string") {
-				config.ui = options;
-			} else {
-				// Extend defaults with passed options
-				for (key in options.mocha) {
-					config[key] = options.mocha[key];
-				}
+			else {
+				console.log(message);
 			}
-		}
-
-		sendMessage('log', config);
-
-		mocha.setup(config);
-		mocha.run();
-
-	}, params.key, params.options);
-});
-
-var messageScan = '["' + params.key + '",';
-var messageScanL = messageScan.length;
-
-page.onConsoleMessage = function (message) {
-	if (String(message).substr(0, messageScanL) === messageScan) {
-		var data = JSON.parse(message);
-		if (data.length === 3 && data[1] === 'mocha' && data[2].type === 'end') {
-			console.log(message);
-			bridge.exit(1, 'mocha-end');
 		}
 		else {
-			console.log(message);
+			bridge.log(message);
 		}
-	}
-	else {
-		bridge.log(message);
-	}
-};
+	};
+
+	page.open(url, function (status) {
+		if (status !== 'success') {
+			bridge.exit(1, 'could not open: ' + url);
+		}
+		page.evaluate(inject, params.key, params.options);
+	});
+}
+
+step();
