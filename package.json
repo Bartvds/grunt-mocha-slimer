@@ -1,0 +1,54 @@
+{
+  "name": "grunt-mocha-slimerjs",
+  "description": "Export TypeScript .d.ts files as an external module definition",
+  "version": "0.1.0",
+  "homepage": "https://github.com/grunt-ts/grunt-mocha-slimerjs",
+  "author": {
+    "name": "Bart van der Schoor",
+    "url": "https://github.com/Bartvds"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/grunt-ts/grunt-mocha-slimerjs"
+  },
+  "bugs": {
+    "url": "https://github.com/grunt-ts/grunt-mocha-slimerjs/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/grunt-ts/grunt-mocha-slimerjs/blob/master/LICENSE-MIT"
+    }
+  ],
+  "keywords": [
+    "gruntplugin",
+    "mocha",
+    "headless",
+    "browser",
+    "test",
+    "slimerjs"
+  ],
+  "main": "Gruntfile.js",
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "dependencies": {
+    "line-input-stream": "^1.0.1",
+    "mocha": "^1.20.1",
+    "slimerjs": "^0.9.1-2"
+  },
+  "devDependencies": {
+    "chai": "^1.9.1",
+    "grunt": "^0.4.5",
+    "grunt-contrib-clean": "^0.5.0",
+    "grunt-contrib-copy": "^0.5.0",
+    "grunt-contrib-jshint": "^0.10.0",
+    "mocha-unfunk-reporter": "^0.4.0"
+  },
+  "peerDependencies": {
+    "grunt": "~0.4.1"
+  }
+}
