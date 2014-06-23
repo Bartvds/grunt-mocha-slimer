@@ -1,3 +1,8 @@
+/* global phantom */
+/* jshint -W014 */
+
+'use strict';
+
 var params = JSON.parse(phantom.args[0]);
 var inject = require('./inject');
 var webpage = require('webpage');
@@ -31,18 +36,30 @@ var bridge = {
 		phantom.exit();
 	}
 };
+var timeout;
+function resetTimeout() {
+	if (timeout) {
+		clearTimeout(timeout);
+	}
+	timeout = setTimeout(function () {
+		bridge.exit(2, 'timeout');
+	}, params.timeout);
+}
 
-var timeout = setTimeout(function () {
-	bridge.exit(2, 'timeout');
-}, params.timeout);
+resetTimeout();
 
 // TODO properly pass this through (rebuild as fake Error?)
 phantom.onError = function (msg, stack) {
-	var msg = '\nScript Error: ' + msg + '\n';
+	msg = '\nScript Error: ' + msg + '\n';
 	if (stack && stack.length) {
 		msg += '       Stack:\n';
 		stack.forEach(function (t) {
-			msg += '         -> ' + (t.file || t.sourceURL) + ': ' + t.line + (t.function ? ' (in function ' + t.function + ')' : '') + '\n';
+			msg += '         -> '
+				+ (t.file || t.sourceURL) + ': '
+				+ t.line
+				+ (t.function ? ' (in function '
+				+ t.function + ')' : '')
+				+ '\n';
 		});
 	}
 	bridge.error(msg);
@@ -57,6 +74,9 @@ function runSuite() {
 		}, 10);
 		return;
 	}
+
+	resetTimeout();
+
 	var url = getURL(queue.shift());
 
 	bridge.log('testing ' + url);

@@ -2,6 +2,8 @@
 // all values need to be passed in, no closures allowed
 
 module.exports = function (messageKey, options) {
+	'use strict';
+
 	function sendMessage(type, content) {
 		console.log(JSON.stringify([messageKey, type, content]));
 	}
@@ -58,12 +60,12 @@ module.exports = function (messageKey, options) {
 		ignoreLeaks: true
 	};
 	if (options) {
-		if (typeof options === "string") {
+		if (typeof options === 'string') {
 			config.ui = options;
 		} else {
-			for (key in options.mocha) {
+			Object.keys(options.mocha).forEach(function(key) {
 				config[key] = options.mocha[key];
-			}
+			});
 		}
 	}
 	// make sure we use this

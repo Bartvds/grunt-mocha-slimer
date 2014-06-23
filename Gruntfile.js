@@ -21,30 +21,43 @@ module.exports = function (grunt) {
 			test: ['./test/tmp']
 		},
 		jshint: {
-			options: {
-				jshintrc: '.jshintrc'
-			},
+			options: grunt.util._.extend(grunt.file.readJSON('.jshintrc'), {
+				reporter: './node_modules/jshint-path-reporter'
+			}),
 			all: [
 				'Gruntfile.js',
-				'tasks/**/*.js'
+				'slimer/**/*.js',
+				'lib/**/*.js',
+				'tasks/**/*.js',
+				'test/**/*.js'
 			]
 		},
 		mocha_slimer: {
-			test: {
-				options: {
-					xvfb: !!process.env.TRAVIS,
-					reporter: 'mocha-unfunk-reporter',
-					timeout: 10000,
-					run: true
-				},
+			options: {
+				xvfb: !!process.env.TRAVIS,
+				reporter: 'mocha-unfunk-reporter',
+				timeout: 10000,
+				run: true
+			},
+			all: {
 				src: ['test/*.html']
+			},
+			pass: {
+				src: ['test/pass.html']
+			},
+			fail: {
+				src: ['test/fail.html']
 			}
 		}
 	});
 
+	grunt.registerTask('lint', [
+		'jshint'
+	]);
+
 	grunt.registerTask('test', [
 		'clean',
-		// 'jshint',
+		'jshint',
 		'mocha_slimer'
 	]);
 	grunt.registerTask('default', ['test']);

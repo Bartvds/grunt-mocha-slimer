@@ -1,3 +1,4 @@
+/* jshint -W031 */
 module.exports = function (grunt) {
 	'use strict';
 
@@ -65,7 +66,8 @@ module.exports = function (grunt) {
 		if (Reporter === null) {
 			grunt.fatal('Specified reporter is unknown or unresolvable: ' + options.reporter);
 		}
-		var reporter = new Reporter(runner);
+
+		new Reporter(runner);
 
 		slimer.on('log', function (data) {
 			console.log(data);

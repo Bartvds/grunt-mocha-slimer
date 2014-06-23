@@ -1,3 +1,5 @@
+'use strict';
+
 chai.config.includeStack = true;
 
 var assert = chai.assert;
@@ -6,7 +8,7 @@ describe('pass', function() {
 
 	it('works', function() {
 		assert.isTrue(true);
-	})
+	});
 
 	it('this also works', function(done) {
 		assert.isTrue(true);
@@ -14,5 +16,5 @@ describe('pass', function() {
 		setTimeout(function() {
 			done();
 		}, 50);
-	})
+	});
 });

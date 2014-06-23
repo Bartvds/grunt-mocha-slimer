@@ -49,7 +49,7 @@
 	"supernew": false,
 	"validthis": false,
 
-	"browser": false,
+	"browser": true,
 	"couch": false,
 	"devel": false,
 	"dojo": false,
@@ -64,5 +64,13 @@
 	"yui": false,
 
 	"globals": {
+		"chai": true,
+		"mocha": true,
+		"it": true,
+		"describe": true,
+		"before": true,
+		"after": true,
+		"beforeEach": true,
+		"afterEach": true
 	}
 }
