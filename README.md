@@ -4,7 +4,9 @@
 
 [![Build Status](https://secure.travis-ci.org/Bartvds/grunt-mocha-slimer.svg?branch=master)](http://travis-ci.org/Bartvds/grunt-mocha-slimer) [![NPM version](https://badge.fury.io/js/grunt-mocha-slimer.svg)](http://badge.fury.io/js/grunt-mocha-slimer) [![Dependency Status](https://david-dm.org/Bartvds/grunt-mocha-slimer.svg)](https://david-dm.org/Bartvds/grunt-mocha-slimer) [![devDependency Status](https://david-dm.org/Bartvds/grunt-mocha-slimer/dev-status.svg)](https://david-dm.org/Bartvds/grunt-mocha-slimer#info=devDependencies)
 
-Build on [SlimerJS](https://github.com/graingert/slimerjs) npm module, some parts sourced from [grunt-mocha](https://github.com/kmiyashiro/grunt-mocha) by @kmiyashiro.
+Run your [Mocha](https://visionmedia.github.io/mocha/) browser tests in SlimerJS's [npm wrapper](https://github.com/graingert/slimerjs) with all the regular reporters.
+
+Some internal parts sourced from [grunt-mocha](https://github.com/kmiyashiro/grunt-mocha) by @kmiyashiro. 
 
 
 :warning: Very early version, user beware.
@@ -13,38 +15,8 @@ Build on [SlimerJS](https://github.com/graingert/slimerjs) npm module, some part
 
 - no error messages in async errors
 - stack traces missing
-- real-world use
-
-
-## Why this and not a PhantomJS based grunt + mocha?
-
-- SlimerJS uses XulRunner (Mozilla Firefox browser-engine + Gecko) so it's another browser engine from PhantomJS' Webkit + V8.
-- PhantomJS uses an ancient Webkit version that is missing some modern features, like Uint8ClampedArray, Float64Array etc. You need this to test interesting `canvas` libraries.
-- SlimerJS supports addons and user-profiles (could be added here if thee is a use-case)
-- `grunt-mocha-slimer` seems slightly faster then `grunt-mocha` as all tests are run in one process (not sure why grunt-mocha doesn't do that, we'll see).
-- This modules streams tests and log data over SlimerJS' stdout for snappy feedback.
-
-
-## I see with flashing windows?
-
-This is the nature of SlimerJS and the engine it runs. On Linux and OSX SlimerJS has support for `xvfb` if you have it installed. For more info see the [SlimerJS documentantion](http://docs.slimerjs.org/current/installation.html#having-a-headless-slimerjs).
-
-You can enable this by setting `xvfb: true` (you need this for Travis-CI, see below).
-
-
-## Wish-list
-
-- support more SlimerJS commandline parameters
-    - user profile handling
-    - proxy
-- loot some more features from grunt-mocha
-    - growl
-    - output-to-file
-- expose screenshot feature?
-- expose a file-io stream (to dump debug data to disk)?
-- auto-inject mocha JS & CSS?
-- support direct JS tests without html?
-- auto-enable xvfb on known CI's?
+- needs a lot more real-world use
+- needs write-to-file support for some reporters
 
 
 ## Getting Started
@@ -110,12 +82,60 @@ grunt.initConfig({
 });
 ```
 
-More to come at a later date.
+Better docs at a later date.
+
+
+## Why not a PhantomJS based grunt + mocha?
+
+- SlimerJS uses Firefox/XulRunner (Gecko) so it's something different PhantomJS' Webkit (V8).
+- PhantomJS uses an ancient Webkit version that is missing some modern features, like Uint8ClampedArray, Float64Array etc. You need this to test interesting `canvas` libraries on a generic node.js based CI like Travis.
+- SlimerJS could enable supports addons and user-profiles (let me know if there is a use-case).
+- `grunt-mocha-slimer` seems slightly faster then `grunt-mocha` as all tests are in one process (not sure why grunt-mocha doesn't do that, we'll see).
+- This modules streams test- and log data over SlimerJS' stdout for snappy feedback.
+
+
+## Why the flashing windows?
+
+This is the nature of SlimerJS and the engine it runs, as . On Linux and OSX SlimerJS has support for `xvfb` if you have it installed. For more info see the [SlimerJS documentantion](http://docs.slimerjs.org/current/installation.html#having-a-headless-slimerjs).
+
+You can enable this by setting `xvfb: true` (you need this for Travis-CI, see below).
+
+
+## Is this ready to use?
+
+Wisdom says no, adventure and necessity say.. give it a  try. It is the simplest way to do all the mocha-flavoured things you cannot do in PhantomJS's crappy archaic Webkit.
+
+I needed it for some OSS projects and it seems to work (well, at least it properly fails if assertions fail).
+
+
+## Future
+
+Probably
+
+- loot some more features from grunt-mocha
+    - growl support
+    - output-to-file (for XUnit etc)
+- support more SlimerJS commandline parameters?
+    - user profile handling?
+    - proxy support?
+- extract mocha/slimer runner to own module 
+ 
+Maybe
+
+- expose screenshot feature?
+- expose a file-io stream (to dump debug data to disk)?
+- auto-inject mocha JS & CSS?
+- support direct JS tests without html?
+- auto-enable xvfb on known CI's?
+
+Out-of-scope:
+
+- WebDriver support (use CasperJS)
 
 
 ## History
 
-* 0.0.x - Early release
+* 0.0.x - Early releases.
 
 
 ## Contributing
@@ -131,5 +151,5 @@ Copyright (c) 2014 [Bart van der Schoor](https://github.com/Bartvds)
 
 Licensed under the MIT license.
 
-Various snippets mutated from [grunt-mocha](https://github.com/kmiyashiro/grunt-mocha) by Kelly Miyashiro
+Various snippets copy/hacked from [grunt-mocha](https://github.com/kmiyashiro/grunt-mocha) by [Kelly Miyashiro](https://github.com/kmiyashiro).
 
