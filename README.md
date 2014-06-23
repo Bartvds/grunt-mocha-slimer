@@ -1,6 +1,6 @@
 # grunt-mocha-slimer
 
-> Grunt [plugin](http://gruntjs.com/) to run [Mocha](https://visionmedia.github.io/mocha/) tests in a (nearly) headless Gecko browser via [SlimerJS](http://slimerjs.org/)
+> Grunt [plugin](http://gruntjs.com/) to run [Mocha](https://visionmedia.github.io/mocha/) tests in a (nearly) headless Mozilla Firefox browser-engine via [SlimerJS](http://slimerjs.org/)
 
 [![Build Status](https://secure.travis-ci.org/Bartvds/grunt-mocha-slimer.svg?branch=master)](http://travis-ci.org/Bartvds/grunt-mocha-slimer) [![NPM version](https://badge.fury.io/js/grunt-mocha-slimer.svg)](http://badge.fury.io/js/grunt-mocha-slimer) [![Dependency Status](https://david-dm.org/Bartvds/grunt-mocha-slimer.svg)](https://david-dm.org/Bartvds/grunt-mocha-slimer) [![devDependency Status](https://david-dm.org/Bartvds/grunt-mocha-slimer/dev-status.svg)](https://david-dm.org/Bartvds/grunt-mocha-slimer#info=devDependencies)
 
@@ -9,12 +9,27 @@ Build on [SlimerJS](https://github.com/graingert/slimerjs) npm module, some part
 
 :warning: Very early version, user beware.
 
-
 ## Known issues
 
 - no error messages in async errors
 - stack traces missing
 - real-world use
+
+
+## Why this and not a PhantomJS based grunt + mocha?
+
+- SlimerJS uses XulRunner (Mozilla Firefox browser-engine + Gecko) so it's another browser engine from PhantomJS' Webkit + V8.
+- PhantomJS uses an ancient Webkit version that is missing some modern features, like Uint8ClampedArray, Float64Array etc. You need this to test interesting `canvas` libraries.
+- SlimerJS supports addons and user-profiles (could be added here if thee is a use-case)
+- `grunt-mocha-slimer` seems slightly faster then `grunt-mocha` as all tests are run in one process (not sure why grunt-mocha doesn't do that, we'll see).
+- This modules streams tests and log data over SlimerJS' stdout for snappy feedback.
+
+
+## I see with flashing windows?
+
+This is the nature of SlimerJS and the engine it runs. On Linux and OSX SlimerJS has support for `xvfb` if you have it installed. For more info see the [SlimerJS documentantion](http://docs.slimerjs.org/current/installation.html#having-a-headless-slimerjs).
+
+You can enable this by setting `xvfb: true` (you need this for Travis-CI, see below).
 
 
 ## Wish-list
@@ -23,24 +38,13 @@ Build on [SlimerJS](https://github.com/graingert/slimerjs) npm module, some part
     - user profile handling
     - proxy
 - loot some more features from grunt-mocha
+    - growl
+    - output-to-file
 - expose screenshot feature?
 - expose a file-io stream (to dump debug data to disk)?
-
-
-## Why this and not a PhantomJS based grunt + mocha?
-
-- SlimerJS uses Gecko so it's another browser engine from PhantomJS' Webkit.
-- PhantomJS uses an ancient Webkit version that is missing some modern features, like Uint8ClampedArray, Float64Array etc.
-- SlimerJS supports addons and user-profiles (could be added here if thee is a use-case)
-- `grunt-mocha-slimer` seems slightly faster then `grunt-mocha` as all tests are run in one process (not sure why grunt-mocha doesn't do that, we'll see).
-- This modules streams tests and log data over SlimerJS' stdout for snappy feedback.
-
-
-## I see with flashing windows?
-
-This is the nature of SlimerJS and the engine it runs. SlimerJS has support for `xvfb` wrapper for Linux and OSX. For more info see the [SlimerJS documentantion](http://docs.slimerjs.org/current/installation.html#having-a-headless-slimerjs).
-
-You can enable this by setting `xvfb: true` (you need this for Travis-CI, see below).
+- auto-inject mocha JS & CSS?
+- support direct JS tests without html?
+- auto-enable xvfb on known CI's?
 
 
 ## Getting Started
@@ -96,7 +100,7 @@ grunt.initConfig({
 				// set to false and call it later for async tests (AMD etc)
 				run: false,
 				// run SlimerJS via 'xvfb-run': for true headless testing
-				// must be true on Travis-CI, use: !!process.env.TRAVIS
+				// must be true on Travis-CI, use: (process.env.TRAVIS === 'true')
 				xvfb: true,
 				// pass http urls (use grunt-contrib-connect etc)
 				urls: ['http://localhost:8080/test/index.html']
@@ -127,5 +131,5 @@ Copyright (c) 2014 [Bart van der Schoor](https://github.com/Bartvds)
 
 Licensed under the MIT license.
 
-Various snippets copied from [grunt-mocha](https://github.com/kmiyashiro/grunt-mocha) by Kelly Miyashiro
+Various snippets mutated from [grunt-mocha](https://github.com/kmiyashiro/grunt-mocha) by Kelly Miyashiro
 

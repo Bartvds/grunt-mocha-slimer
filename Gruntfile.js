@@ -11,15 +11,11 @@
 module.exports = function (grunt) {
 
 	grunt.loadNpmTasks('grunt-contrib-jshint');
-	grunt.loadNpmTasks('grunt-contrib-clean');
-	grunt.loadNpmTasks('grunt-contrib-copy');
+	grunt.loadNpmTasks('grunt-mocha-test');
 
 	grunt.loadTasks('tasks');
 
 	grunt.initConfig({
-		clean: {
-			test: ['./test/tmp']
-		},
 		jshint: {
 			options: grunt.util._.extend(grunt.file.readJSON('.jshintrc'), {
 				reporter: './node_modules/jshint-path-reporter'
@@ -32,14 +28,26 @@ module.exports = function (grunt) {
 				'test/**/*.js'
 			]
 		},
+		mochaTest: {
+			options: {
+				reporter: 'mocha-unfunk-reporter',
+				timeout: 20000
+			},
+			spec: {
+				src: ['test/spec.js']
+			}
+		},
 		mocha_slimer: {
 			options: {
-				xvfb: !!process.env.TRAVIS,
-				reporter: 'mocha-unfunk-reporter',
-				timeout: 10000,
+				xvfb: (process.env.TRAVIS === 'true'),
+				reporter: 'Dot',
+				timeout: 5000,
 				run: true
 			},
 			all: {
+				options: {
+					reporter: 'mocha-unfunk-reporter'
+				},
 				src: ['test/*.html']
 			},
 			pass: {
@@ -56,10 +64,14 @@ module.exports = function (grunt) {
 	]);
 
 	grunt.registerTask('test', [
-		'clean',
-		'jshint',
+		'lint',
+		'mochaTest'
+	]);
+
+	grunt.registerTask('default', ['dev']);
+
+	grunt.registerTask('dev', [
+		'lint',
 		'mocha_slimer'
 	]);
-	grunt.registerTask('default', ['test']);
-	grunt.registerTask('dev', ['mocha']);
 };
