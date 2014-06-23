@@ -1,10 +1,10 @@
 # grunt-mocha-slimerjs
 
-> Grunt [plugin](http://gruntjs.com/) to export TypeScript .d.ts files as an external module definition with [mocha-slimerjs](https://github.com/Bartvds/mocha-slimerjs)
+> Grunt [plugin](http://gruntjs.com/) to run [Mocha](https://visionmedia.github.io/mocha/) tests in a (nearly) headless Gecko browser via [Slimerjs](http://slimerjs.org/)
 
 [![Build Status](https://secure.travis-ci.org/Bartvds/grunt-mocha-slimerjs.svg?branch=master)](http://travis-ci.org/Bartvds/grunt-mocha-slimerjs) [![NPM version](https://badge.fury.io/js/grunt-mocha-slimerjs.svg)](http://badge.fury.io/js/grunt-mocha-slimerjs) [![Dependency Status](https://david-dm.org/Bartvds/grunt-mocha-slimerjs.svg)](https://david-dm.org/Bartvds/grunt-mocha-slimerjs) [![devDependency Status](https://david-dm.org/Bartvds/grunt-mocha-slimerjs/dev-status.svg)](https://david-dm.org/Bartvds/grunt-mocha-slimerjs#info=devDependencies)
 
-Simple wrapper for [mocha-slimerjs](https://github.com/Bartvds/mocha-slimerjs).
+Build on [slimerjs](https://github.com/graingert/slimerjs) npm modules.
 
 Some parts sourced from [grunt-mocha](https://github.com/kmiyashiro/grunt-mocha) by @kmiyashiro.
 

@@ -1,23 +1,23 @@
 {
   "name": "grunt-mocha-slimerjs",
-  "description": "Export TypeScript .d.ts files as an external module definition",
-  "version": "0.1.0",
-  "homepage": "https://github.com/grunt-ts/grunt-mocha-slimerjs",
+  "description": "Grunt plugin runs Mocha tests in a (nearly) headless Gecko browser via Slimerjs ",
+  "version": "0.0.1",
+  "homepage": "https://github.com/Bartvds/grunt-mocha-slimerjs",
   "author": {
     "name": "Bart van der Schoor",
     "url": "https://github.com/Bartvds"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/grunt-ts/grunt-mocha-slimerjs"
+    "url": "https://github.com/Bartvds/grunt-mocha-slimerjs"
   },
   "bugs": {
-    "url": "https://github.com/grunt-ts/grunt-mocha-slimerjs/issues"
+    "url": "https://github.com/Bartvds/grunt-mocha-slimerjs/issues"
   },
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://github.com/grunt-ts/grunt-mocha-slimerjs/blob/master/LICENSE-MIT"
+      "url": "https://github.com/Bartvds/grunt-mocha-slimerjs/blob/master/LICENSE-MIT"
     }
   ],
   "keywords": [
