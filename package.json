@@ -1,7 +1,7 @@
 {
   "name": "grunt-mocha-slimer",
   "description": "Grunt plugin runs Mocha tests in a (nearly) headless Mozilla Firefox browser-engine via SlimerJS",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "homepage": "https://github.com/Bartvds/grunt-mocha-slimer",
   "author": {
     "name": "Bart van der Schoor",
