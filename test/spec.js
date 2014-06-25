@@ -64,7 +64,7 @@ describe('main', function () {
 	testGrunt({
 		task: 'mocha_slimer:pass',
 		success: true,
-		summary: />> failed 0 and passed 2 of 2 tests total \(\d+ms\)/m
+		summary: />> passed 2 of 2 tests total \(\d+ms\)/m
 	});
 	testGrunt({
 		task: 'mocha_slimer:fail',

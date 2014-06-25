@@ -72,6 +72,6 @@ module.exports = function (grunt) {
 
 	grunt.registerTask('dev', [
 		'lint',
-		'mocha_slimer'
+		'mocha_slimer:pass'
 	]);
 };

@@ -1,20 +1,13 @@
 /* jshint -W031 */
+/* jshint -W098 */
 module.exports = function (grunt) {
 	'use strict';
 
-	var util = require('util');
 	var path = require('path');
 	var events = require('events');
 
 	var wrapper = require('../lib/wrapper');
 	var helper = require('../lib/helper');
-
-	function multi(data, sep) {
-		if (typeof data !== 'string') {
-			data = util.inspect(data, {depth: 4});
-		}
-		return sep + String(data).split(/\r?\n/g).join('\n' + sep);
-	}
 
 	grunt.registerMultiTask('mocha_slimer', 'Run mocha in slimerjs', function () {
 		// user options
@@ -69,12 +62,12 @@ module.exports = function (grunt) {
 
 		new Reporter(runner);
 
-		slimer.on('log', function (data) {
-			console.log(data);
+		slimer.on('log', function () {
+			console.log.apply(console, arguments);
 		});
 
 		slimer.on('error', function (error) {
-			console.error(multi(error, '! '));
+			console.error.apply(console, arguments);
 		});
 
 		// capture mocha events and emit to facade runner
@@ -107,7 +100,7 @@ module.exports = function (grunt) {
 
 		slimer.on('exit', function (data) {
 			exitCode = data.code;
-			console.log(multi(data.reason, '>> '));
+			console.log('>> ', data.reason);
 		});
 
 		slimer.on('close', function () {
@@ -117,9 +110,11 @@ module.exports = function (grunt) {
 			var report = '\n>> ';
 			var str;
 
-			str = 'failed ' + total.failures;
-			report += (total.failures > 0 ? str.red : str.green);
-			report += ' and ';
+			if (total.failures > 0) {
+				str = 'failed ' + total.failures;
+				report += (total.failures > 0 ? str.red : str.green);
+				report += ' and ';
+			}
 
 			str = 'passed ' + total.passes;
 			report += (total.failures > 0 ? str.yellow : str.green);

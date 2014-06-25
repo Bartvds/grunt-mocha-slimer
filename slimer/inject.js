@@ -5,7 +5,7 @@ module.exports = function (messageKey, options) {
 	'use strict';
 
 	function sendMessage(type, content) {
-		console.log(JSON.stringify([messageKey, type, content]));
+		window.alert(JSON.stringify([messageKey, type, content]));
 	}
 
 	var mochaInstance = window.Mocha || window.mocha;
