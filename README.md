@@ -44,7 +44,7 @@ For an example html see the [./test folder](https://github.com/Bartvds/grunt-moc
 
 ```js
 grunt.initConfig({
-	mocha_slimerjs: {
+	mocha_slimer: {
 		all: {
 			options: {
 				ui: 'bdd'
@@ -61,7 +61,7 @@ grunt.initConfig({
 
 ```js
 grunt.initConfig({
-	mocha_slimerjs: {
+	mocha_slimer: {
 		all: {
 			options: {
 				ui: 'bdd'
