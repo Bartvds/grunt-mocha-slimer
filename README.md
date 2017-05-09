@@ -1,10 +1,10 @@
 # grunt-mocha-slimer
 
-> Grunt [plugin](http://gruntjs.com/) to run [Mocha](https://visionmedia.github.io/mocha/) tests in a (nearly) headless Mozilla Firefox browser-engine via [SlimerJS](http://slimerjs.org/)
+> Grunt [plugin](http://gruntjs.com/) to run [Mocha](http://mochajs.org/) tests in a (nearly) headless Mozilla Firefox browser-engine via [SlimerJS](http://slimerjs.org/)
 
 [![Build Status](https://secure.travis-ci.org/Bartvds/grunt-mocha-slimer.svg?branch=master)](http://travis-ci.org/Bartvds/grunt-mocha-slimer) [![NPM version](https://badge.fury.io/js/grunt-mocha-slimer.svg)](http://badge.fury.io/js/grunt-mocha-slimer) [![Dependency Status](https://david-dm.org/Bartvds/grunt-mocha-slimer.svg)](https://david-dm.org/Bartvds/grunt-mocha-slimer) [![devDependency Status](https://david-dm.org/Bartvds/grunt-mocha-slimer/dev-status.svg)](https://david-dm.org/Bartvds/grunt-mocha-slimer#info=devDependencies)
 
-Run your [Mocha](https://visionmedia.github.io/mocha/) browser tests in SlimerJS's [npm wrapper](https://github.com/graingert/slimerjs) with all the regular reporters.
+Run your [Mocha](http://mochajs.org/) browser tests in SlimerJS's [npm wrapper](https://github.com/graingert/slimerjs) with all the regular reporters.
 
 Some internal parts sourced from [grunt-mocha](https://github.com/kmiyashiro/grunt-mocha) by @kmiyashiro. 
 
